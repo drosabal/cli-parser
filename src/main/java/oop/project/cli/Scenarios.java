@@ -60,7 +60,7 @@ public class Scenarios {
         Command command = parser.parse(input);
         if (command != null) {
             double right = (Double)command.getArgs().get(0);
-            if (command.getFlags().get("left").getArg().isPresent()) {
+            if (command.getFlags().get("left") != null) {
                 Double left = (Double)command.getFlags().get("left").getArg().get();
                 return Map.of("left", left, "right", right);
             } else {

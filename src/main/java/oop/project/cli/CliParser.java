@@ -92,7 +92,7 @@ public class CliParser {
                                 i++;
                             }
                             String newInput = String.join(" ", newTokens);
-                            command.setSubcommand(parse(newInput));
+                            command.setSubcommand(parser.parse(newInput));
                             parserFound = true;
                             break;
                         }

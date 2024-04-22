@@ -24,18 +24,18 @@ public class ScenariosTests {
 
         public static Stream<Arguments> testAdd() {
             return Stream.of(
-                Arguments.of("Add", "add 1 2", Map.of("left", 1, "right", 2)),
-                Arguments.of("Missing Argument", "add 1", null),
-                Arguments.of("Extraneous Argument", "add 1 2 3", null),
-                Arguments.of("Not A Number", "add one two", null),
-                Arguments.of("Not An Integer", "add 1.0 2.0", null)
+                Arguments.of("Add", "add \"1\" \"2\"", Map.of("left", 1, "right", 2)),
+                Arguments.of("Missing Argument", "add \"1\"", null),
+                Arguments.of("Extraneous Argument", "add \"1\" \"2\" \"3\"", null),
+                Arguments.of("Not A Number", "add \"one\" \"two\"", null),
+                Arguments.of("Not An Integer", "add \"1.0\" \"2.0\"", null)
             );
         }
 
     }
 
     @Nested
-    class Div {
+    class Sub {
 
         @ParameterizedTest
         @MethodSource
@@ -45,13 +45,12 @@ public class ScenariosTests {
 
         public static Stream<Arguments> testSub() {
             return Stream.of(
-                Arguments.of("Sub", "sub --left 1.0 --right 2.0", Map.of("left", 1.0, "right", 2.0)),
-                Arguments.of("Left Only", "sub --left 1.0", null),
-                Arguments.of("Right Only", "sub --right 2.0", Map.of("left", Optional.empty(), "right", 2.0)),
-                Arguments.of("Missing Value", "sub --right", null),
-                Arguments.of("Extraneous Argument", "sub --right 2.0 extraneous", null),
-                Arguments.of("Misspelled Flag", "sub --write 2.0", null),
-                Arguments.of("Not A Number", "sub --right two", null)
+                Arguments.of("Sub", "sub --left \"1.0\" \"2.0\"", Map.of("left", 1.0, "right", 2.0)),
+                Arguments.of("Left Only", "sub --left \"1.0\"", null),
+                Arguments.of("Right Only", "sub \"2.0\"", Map.of("left", Optional.empty(), "right", 2.0)),
+                Arguments.of("Extraneous Argument", "sub \"2.0\" \"extraneous\"", null),
+                Arguments.of("Incorrect Flag", "sub --flag \"1.0\" \"2.0\"", null),
+                Arguments.of("Not A Number", "sub \"two\"", null)
             );
         }
 
@@ -68,10 +67,10 @@ public class ScenariosTests {
 
         public static Stream<Arguments> testSqrt() {
             return Stream.of(
-                Arguments.of("Valid", "sqrt 4", Map.of("number", 4)),
-                Arguments.of("Imperfect Square", "sqrt 3", Map.of("number", 3)),
-                Arguments.of("Zero", "sqrt 0", Map.of("number", 0)),
-                Arguments.of("Negative", "sqrt -1", null)
+                Arguments.of("Valid", "sqrt \"4\"", Map.of("number", 4)),
+                Arguments.of("Imperfect Square", "sqrt \"3\"", Map.of("number", 3)),
+                Arguments.of("Zero", "sqrt \"0\"", Map.of("number", 0)),
+                Arguments.of("Negative", "sqrt \"-1\"", Map.of("number", -1))
             );
         }
 
