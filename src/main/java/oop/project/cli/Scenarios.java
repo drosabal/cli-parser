@@ -38,11 +38,11 @@ public class Scenarios {
      */
     private static Map<String, Object> add(String input) {
         CliParser parser = new CliParser("add", false);
-        parser.addArg(Integer.valueOf(0)).addArg(Integer.valueOf(0));
+        parser.addArg(Integer.class).addArg(Integer.class);
         Command command = parser.parse(input);
-        if (command != null) {
-            int left = (Integer)command.getArgs().get(0);
-            int right = (Integer)command.getArgs().get(1);
+        if (command != null && command.getArgs().size() == 2) {
+            int left = (Integer) command.getArgs().get(0);
+            int right = (Integer) command.getArgs().get(1);
             return Map.of("left", left, "right", right);
         } else {
             return null;
@@ -56,17 +56,12 @@ public class Scenarios {
      */
     static Map<String, Object> sub(String input) {
         CliParser parser = new CliParser("sub", false);
-        parser.addFlag("left", Double.valueOf(0)).addArg(Double.valueOf(0));
+        parser.addFlag("left", Double.class).addArg(Double.class);
         Command command = parser.parse(input);
-        if (command != null) {
-            double right = (Double)command.getArgs().get(0);
-            if (command.getFlags().get("left").getArg().isPresent()) {
-                Double left = (Double)command.getFlags().get("left").getArg().get();
-                return Map.of("left", left, "right", right);
-            } else {
-                Optional<Double> left = Optional.empty();
-                return Map.of("left", left, "right", right);
-            }
+        if (command != null && command.getArgs().size() == 1) {
+            Double right = (Double)command.getArgs().getFirst();
+            Double left = command.getFlags().containsKey("left") ? (Double)command.getFlags().get("left").getArg().orElse(null) : null;
+            return Map.of("left", Optional.ofNullable(left), "right", right);
         } else {
             return null;
         }
@@ -78,14 +73,15 @@ public class Scenarios {
      */
     static Map<String, Object> sqrt(String input) {
         CliParser parser = new CliParser("sqrt", false);
-        parser.addArg(Integer.valueOf(0));
+        parser.addArg(Integer.class);
         Command command = parser.parse(input);
-        if (command != null) {
-            int number = (Integer)command.getArgs().get(0);
-            return Map.of("number", number);
-        } else {
-            return null;
+        if (command != null && command.getArgs().size() == 1) {
+            int number = (Integer)command.getArgs().getFirst();
+            if (number >= 0) {
+                return Map.of("number", number);
+            }
         }
+        return null;
     }
 
     /**
@@ -101,7 +97,7 @@ public class Scenarios {
         CliParser sqrtParser = new CliParser("sqrt", false);
         calcParser.addSubparser(addParser).addSubparser(subParser).addSubparser(sqrtParser);
         Command command = calcParser.parse(input);
-        if (command != null) {
+        if (command != null && command.getSubcommand().isPresent()) {
             String subcommand = command.getSubcommand().get().getName();
             return Map.of("subcommand", subcommand);
         } else {
@@ -117,9 +113,15 @@ public class Scenarios {
      *       out of the box and requires a custom type to be defined.
      */
     static Map<String, Object> date(String input) {
-        //TODO: Parse arguments and extract values.
-        LocalDate date = LocalDate.EPOCH;
-        return Map.of("date", date);
+        CliParser parser = new CliParser("date", false);
+        parser.addArg(LocalDate.class);
+        Command command = parser.parse(input);
+        if (command != null && command.getArgs().size() == 1) {
+            LocalDate date = (LocalDate) command.getArgs().getFirst();
+            return Map.of("date", date);
+        } else {
+            return null;
+        }
     }
 
     //TODO: Add your own scenarios based on your software design writeup. You
