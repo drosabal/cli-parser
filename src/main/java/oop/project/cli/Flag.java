@@ -4,8 +4,8 @@ import java.util.Optional;
 
 public class Flag {
 
-    String name;
-    Object arg;
+    private final String name;
+    private final Object arg;
 
     Flag(String name, Object arg) {
         this.name = name;

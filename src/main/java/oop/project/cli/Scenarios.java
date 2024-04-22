@@ -13,20 +13,20 @@ public class Scenarios {
      * structure and requirements you may need to make changes to adapt it to
      * your needs - use whatever is convenient for your design.
      */
-    public static Map<String, Object> parse(String command) {
+    public static Map<String, Object> parse(String input) {
         //This assumes commands follow a similar structure to unix commands,
         //e.g. `command [arguments...]`. If your project uses a different
         //structure, e.g. Lisp syntax like `(command [arguments...])`, you may
         //need to adjust this a bit to work as expected.
-        var split = command.split(" ", 2);
+        var split = input.split(" ", 2);
         var base = split[0];
         var arguments = split.length == 2 ? split[1] : "";
         return switch (base) {
-            case "add" -> add(arguments);
-            case "sub" -> sub(arguments);
-            case "sqrt" -> sqrt(arguments);
-            case "calc" -> calc(arguments);
-            case "date" -> date(arguments);
+            case "add" -> add(input);
+            case "sub" -> sub(input);
+            case "sqrt" -> sqrt(input);
+            case "calc" -> calc(input);
+            case "date" -> date(input);
             default -> throw new IllegalArgumentException("Unknown command.");
         };
     }
@@ -36,10 +36,13 @@ public class Scenarios {
      *  - {@code left: <your integer type>}
      *  - {@code right: <your integer type>}
      */
-    private static Map<String, Object> add(String arguments) {
+    private static Map<String, Object> add(String input) {
         //TODO: Parse arguments and extract values.
-        int left = 0; //or BigInteger, etc.
-        int right = 0;
+        CliParser parser = new CliParser("add", false);
+        parser.addArg(Integer.valueOf(0)).addArg(Integer.valueOf(0));
+        Command command = parser.parse(input);
+        int left = (Integer)command.getArgs().get(0);
+        int right = (Integer)command.getArgs().get(1);
         return Map.of("left", left, "right", right);
     }
 

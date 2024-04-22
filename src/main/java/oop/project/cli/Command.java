@@ -1,15 +1,18 @@
 package oop.project.cli;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 public class Command {
 
-    String name;
-    Set<Flag> flags;
-    List<Object> args;
-    Command subcommand;
+    private String name;
+    private final Set<Flag> flags;
+    private final List<Object> args;
+    private Command subcommand;
+
+    Command() {
+        flags = new HashSet<>();
+        args = new ArrayList<>();
+    }
 
     void setName(String name) {
         this.name = name;
