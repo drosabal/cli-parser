@@ -117,16 +117,8 @@ public class ScenariosTests {
     }
 
     private static void test(String command, Object expected) {
-        if (expected != null) {
-            var result = Scenarios.parse(command);
-            Assertions.assertEquals(expected, result);
-        } else {
-            //TODO: Update with your specific Exception class or whatever other
-            //error handling model you use to check for specific library issues.
-            Assertions.assertThrows(Exception.class, () -> {
-                Scenarios.parse(command);
-            });
-        }
+        var result = Scenarios.parse(command);
+        Assertions.assertEquals(expected, result);
     }
 
 }

@@ -5,12 +5,12 @@ import java.util.*;
 public class Command {
 
     private String name;
-    private final Set<Flag> flags;
+    private final Map<String, Flag> flags;
     private final List<Object> args;
     private Command subcommand;
 
     Command() {
-        flags = new HashSet<>();
+        flags = new HashMap<>();
         args = new ArrayList<>();
     }
 
@@ -19,7 +19,7 @@ public class Command {
     }
 
     void addFlag(Flag flag) {
-        flags.add(flag);
+        flags.put(flag.getName(), flag);
     }
 
     void addArg(Object arg) {
@@ -34,7 +34,7 @@ public class Command {
         return name;
     }
 
-    public Set<Flag> getFlags() {
+    public Map<String, Flag> getFlags() {
         return flags;
     }
 

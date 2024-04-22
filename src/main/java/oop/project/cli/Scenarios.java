@@ -37,49 +37,76 @@ public class Scenarios {
      *  - {@code right: <your integer type>}
      */
     private static Map<String, Object> add(String input) {
-        //TODO: Parse arguments and extract values.
         CliParser parser = new CliParser("add", false);
         parser.addArg(Integer.valueOf(0)).addArg(Integer.valueOf(0));
         Command command = parser.parse(input);
-        int left = (Integer)command.getArgs().get(0);
-        int right = (Integer)command.getArgs().get(1);
-        return Map.of("left", left, "right", right);
+        if (command != null) {
+            int left = (Integer)command.getArgs().get(0);
+            int right = (Integer)command.getArgs().get(1);
+            return Map.of("left", left, "right", right);
+        } else {
+            return null;
+        }
     }
 
     /**
-     * Takes two <em>named</em> arguments:
-     *  - {@code left: <your decimal type>} (optional)
-     *     - If your project supports default arguments, you could also parse
-     *       this as a non-optional decimal value using a default of 0.0.
-     *  - {@code right: <your decimal type>} (required)
+     * Takes one named argument and one positional argument:
+     *  - {@code left: <your decimal type>} (optional, named)
+     *  - {@code right: <your decimal type>} (required, positional)
      */
-    static Map<String, Object> sub(String arguments) {
-        //TODO: Parse arguments and extract values.
-        Optional<Double> left = Optional.empty();
-        double right = 0.0;
-        return Map.of("left", left, "right", right);
+    static Map<String, Object> sub(String input) {
+        CliParser parser = new CliParser("sub", false);
+        parser.addFlag("left", Double.valueOf(0)).addArg(Double.valueOf(0));
+        Command command = parser.parse(input);
+        if (command != null) {
+            double right = (Double)command.getArgs().get(0);
+            if (command.getFlags().get("left").getArg().isPresent()) {
+                Double left = (Double)command.getFlags().get("left").getArg().get();
+                return Map.of("left", left, "right", right);
+            } else {
+                Optional<Double> left = Optional.empty();
+                return Map.of("left", left, "right", right);
+            }
+        } else {
+            return null;
+        }
     }
 
     /**
      * Takes one positional argument:
      *  - {@code number: <your integer type>} where {@code number >= 0}
      */
-    static Map<String, Object> sqrt(String arguments) {
-        //TODO: Parse arguments and extract values.
-        int number = 0;
-        return Map.of("number", number);
+    static Map<String, Object> sqrt(String input) {
+        CliParser parser = new CliParser("sqrt", false);
+        parser.addArg(Integer.valueOf(0));
+        Command command = parser.parse(input);
+        if (command != null) {
+            int number = (Integer)command.getArgs().get(0);
+            return Map.of("number", number);
+        } else {
+            return null;
+        }
     }
 
     /**
      * Takes one positional argument:
-     *  - {@code subcommand: "add" | "div" | "sqrt" }, aka one of these values.
+     *  - {@code subcommand: "add" | "sub" | "sqrt" }, aka one of these values.
      *     - Note: Not all projects support subcommands, but if yours does you
      *       may want to take advantage of this scenario for that.
      */
-    static Map<String, Object> calc(String arguments) {
-        //TODO: Parse arguments and extract values.
-        String subcommand = "";
-        return Map.of("subcommand", subcommand);
+    static Map<String, Object> calc(String input) {
+        CliParser calcParser = new CliParser("calc", true);
+        CliParser addParser = new CliParser("add", false);
+        CliParser subParser = new CliParser("sub", false);
+        CliParser sqrtParser = new CliParser("sqrt", false);
+        calcParser.addSubparser(addParser).addSubparser(subParser).addSubparser(sqrtParser);
+        Command command = calcParser.parse(input);
+        if (command != null) {
+            String subcommand = command.getSubcommand().get().getName();
+            return Map.of("subcommand", subcommand);
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -89,7 +116,7 @@ public class Scenarios {
      *     - Note: Consider this a type that CANNOT be supported by your library
      *       out of the box and requires a custom type to be defined.
      */
-    static Map<String, Object> date(String arguments) {
+    static Map<String, Object> date(String input) {
         //TODO: Parse arguments and extract values.
         LocalDate date = LocalDate.EPOCH;
         return Map.of("date", date);
