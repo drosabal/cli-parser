@@ -1,6 +1,8 @@
 package oop.project.cli;
 
 import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -45,66 +47,24 @@ public class CliParser {
      */
     public Command parse(String input) {
         Command command = new Command();
-        String[] tokens = input.split(" +");
+        String[] tokens = input.trim().split(" +");
         try {
             if (tokens.length > 0 && name.equals(tokens[0])) {
                 command.setName(name);
             } else {
                 throw new ParseException(ERROR_FORMAT, 0);
             }
+            int argIndex = 0;
             for (int i = 1; i < tokens.length; i++) {
-                if (tokens[i].startsWith("--") && tokens[i].length() > 2) {
-                    String name = tokens[i].substring(2);
-                    boolean flagFound = false;
-                    for (Flag flag : flags) {
-                        if (name.equals(flag.getName())) {
-                            if (flag.getArg().isPresent()) {
-                                if (i + 1 >= tokens.length) {
-                                    throw new ParseException(ERROR_FORMAT, 0);
-                                }
-                                Object arg = parseArg(tokens[i + 1], flag.getArg().get());
-                                command.addFlag(new Flag(name, arg));
-                                i++;
-                            } else {
-                                command.addFlag(flag);
-                            }
-                            flagFound = true;
-                            break;
-                        }
-                    }
-                    if (!flagFound) {
-                        throw new ParseException(ERROR_FLAG, 0);
-                    }
-                } else if (tokens[i].startsWith("\"") && tokens[i].endsWith("\"")) {
-                    int argIndex = command.getArgs().size();
-                    if (argIndex < args.size()) {
-                        command.addArg(parseArg(tokens[i], args.get(argIndex)));
-                    } else {
-                        throw new ParseException(ERROR_FORMAT, 0);
-                    }
-                } else if (tokens[i].substring(0, 1).matches("[a-zA-Z0-9]")) {
-                    boolean parserFound = false;
-                    for (CliParser parser : subparsers) {
-                        if (parser.name.equals(tokens[i])) {
-                            ArrayList<String> newTokens = new ArrayList<>();
-                            while (i < tokens.length) {
-                                newTokens.add(tokens[i]);
-                                i++;
-                            }
-                            String newInput = String.join(" ", newTokens);
-                            command.setSubcommand(parse(newInput));
-                            parserFound = true;
-                            break;
-                        }
-                    }
-                    if (!parserFound) {
-                        throw new ParseException(ERROR_FORMAT, 0);
-                    }
+                if (argIndex < args.size()) {
+                    Object parsedArg = parseArg(tokens[i], args.get(argIndex));
+                    command.addArg(parsedArg);
+                    argIndex++;
                 } else {
                     throw new ParseException(ERROR_FORMAT, 0);
                 }
             }
-            if ((subcommandRequired && command.getSubcommand().isEmpty()) || args.size() != command.getArgs().size()) {
+            if (args.size() != command.getArgs().size()) {
                 throw new ParseException(ERROR_FORMAT, 0);
             }
         } catch (ParseException e) {
@@ -117,22 +77,25 @@ public class CliParser {
     /**
      * Parses token into an object with the same type as arg and returns it.
      */
-    private Object parseArg(String token, Object arg) throws ParseException {
-        String name = token.substring(1, token.length() - 1);
-        if (arg instanceof Integer) {
+    private Object parseArg(String token, Object argType) throws ParseException {
+        if (argType.equals(Integer.class)) {
             try {
-                return Integer.valueOf(name);
+                return Integer.valueOf(token);
             } catch (NumberFormatException e) {
                 throw new ParseException(ERROR_ARG, 0);
             }
-        } else if (arg instanceof Double) {
+        } else if (argType.equals(Double.class)) {
             try {
-                return Double.valueOf(name);
+                return Double.valueOf(token);
             } catch (NumberFormatException e) {
                 throw new ParseException(ERROR_ARG, 0);
             }
-        } else if (arg instanceof String) {
-            return name;
+        } else if (argType.equals(LocalDate.class)) {
+            try {
+                return LocalDate.parse(token);
+            } catch (DateTimeParseException e) {
+                throw new ParseException(ERROR_ARG, 0);
+            }
         } else {
             throw new ParseException(ERROR_ARG, 0);
         }
