@@ -157,4 +157,76 @@ public class Scenarios {
         }
     }
 
+    /**
+     * Simulates file operation with advanced error handling.
+     * Example: fileOperation (--delete "example.txt" --force)
+     */
+    static Map<String, Object> fileOperation(String input) {
+        CliParser parser = new CliParser("fileOperation", false);
+        parser.addFlag("delete", "").addFlag("force", Boolean.FALSE);
+        Command command = parser.parse(input);
+        if (command != null) {
+            String fileToDelete = (String)command.getFlags().get("delete").getArg().orElse(null);
+            Boolean force = (Boolean)command.getFlags().get("force").getArg().orElse(null);
+            return Map.of("fileToDelete", fileToDelete, "force", force);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Manages user permissions with multiple flags.
+     * Example: setUserRole ("john_doe" --role "admin" --expires "2023-12-31")
+     */
+    static Map<String, Object> setUserRole(String input) {
+        CliParser parser = new CliParser("setUserRole", false);
+        parser.addArg("").addFlag("role", "").addFlag("expires", LocalDate.now());
+        Command command = parser.parse(input);
+        if (command != null) {
+            String username = (String)command.getArgs().get(0);
+            String role = (String)command.getFlags().get("role").getArg().orElse(null);
+            LocalDate expires = (LocalDate)command.getFlags().get("expires").getArg().orElse(null);
+            return Map.of("username", username, "role", role, "expires", expires);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Parses and validates data processing tasks with detailed error messages.
+     * Example: processData ("data.csv" --validate --clean)
+     */
+    static Map<String, Object> processData(String input) {
+        CliParser parser = new CliParser("processData", false);
+        parser.addArg("").addFlag("validate", Boolean.FALSE).addFlag("clean", Boolean.FALSE);
+        Command command = parser.parse(input);
+        if (command != null) {
+            String dataFile = (String)command.getArgs().get(0);
+            Boolean validate = (Boolean)command.getFlags().get("validate").getArg().orElse(null);
+            Boolean clean = (Boolean)command.getFlags().get("clean").getArg().orElse(null);
+            return Map.of("dataFile", dataFile, "validate", validate, "clean", clean);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Manages complex event scheduling with multiple types of data.
+     * Example: scheduleEvent ("2023-11-25" "Meeting" --location "Conference Room A" --reminder "15")
+     */
+    static Map<String, Object> scheduleEvent(String input) {
+        CliParser parser = new CliParser("scheduleEvent", false);
+        parser.addArg("").addArg("").addFlag("location", "").addFlag("reminder", Integer.valueOf(0));
+        Command command = parser.parse(input);
+        if (command != null) {
+            LocalDate date = LocalDate.parse((String)command.getArgs().get(0));
+            String title = (String)command.getArgs().get(1);
+            String location = (String)command.getFlags().get("location").getArg().orElse(null);
+            Integer reminder = (Integer)command.getFlags().get("reminder").getArg().orElse(null);
+            return Map.of("date", date, "title", title, "location", location, "reminder", reminder);
+        } else {
+            return null;
+        }
+    }
+
 }
