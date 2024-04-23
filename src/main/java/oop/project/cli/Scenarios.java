@@ -117,14 +117,36 @@ public class Scenarios {
      *       out of the box and requires a custom type to be defined.
      */
     static Map<String, Object> date(String input) {
-        //TODO: Parse arguments and extract values.
-        LocalDate date = LocalDate.EPOCH;
-        return Map.of("date", date);
+        CliParser parser = new CliParser("date", false);
+        parser.addArg(LocalDate.now());
+        Command command = parser.parse(input);
+        if (command != null) {
+            LocalDate date = (LocalDate)command.getArgs().getFirst();
+            return Map.of("date", date);
+        } else {
+            return null;
+        }
     }
 
     //TODO: Add your own scenarios based on your software design writeup. You
     //should have a couple from pain points at least, and likely some others
     //for notable features. This doesn't need to be exhaustive, but this is a
     //good place to test/showcase your functionality in context.
+
+    static Map<String, Object> registerUser(String input) {
+        CliParser parser = new CliParser("registerUser", false);
+        parser.addArg(String.class)
+                .addArg(String.class)
+                .addFlag("password", String.class);
+        Command command = parser.parse(input);
+        if (command != null && command.getArgs().size() == 2) {
+            String username = (String) command.getArgs().get(0);
+            String email = (String) command.getArgs().get(1);
+            Optional<String> password = command.getFlags().containsKey("password") ? Optional.of((String)command.getFlags().get("password").getArg().get()) : Optional.empty(); // Corrected Line
+            return Map.of("username", username, "email", email, "password", password);
+        } else {
+            return null;
+        }
+    }
 
 }

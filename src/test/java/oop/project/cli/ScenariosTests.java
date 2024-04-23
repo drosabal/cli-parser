@@ -108,8 +108,8 @@ public class ScenariosTests {
 
         public static Stream<Arguments> testDate() {
             return Stream.of(
-                Arguments.of("Date", "date 2024-01-01", Map.of("date", LocalDate.of(2024, 1, 1))),
-                Arguments.of("Invalid", "date 20240401", null)
+                Arguments.of("Date", "date \"2024-01-01\"", Map.of("date", LocalDate.of(2024, 1, 1))),
+                Arguments.of("Invalid", "date \"20240401\"", null)
             );
         }
 

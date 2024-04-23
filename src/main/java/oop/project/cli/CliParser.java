@@ -1,6 +1,8 @@
 package oop.project.cli;
 
 import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -129,6 +131,12 @@ public class CliParser {
             try {
                 return Double.valueOf(name);
             } catch (NumberFormatException e) {
+                throw new ParseException(ERROR_ARG, 0);
+            }
+        } else if (arg instanceof LocalDate) {
+            try {
+                return LocalDate.parse(token);
+            } catch (DateTimeParseException e) {
                 throw new ParseException(ERROR_ARG, 0);
             }
         } else if (arg instanceof String) {
