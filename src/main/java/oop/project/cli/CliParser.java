@@ -133,14 +133,14 @@ public class CliParser {
             } catch (NumberFormatException e) {
                 throw new ParseException(ERROR_ARG, 0);
             }
+        } else if (arg instanceof String) {
+            return name;
         } else if (arg instanceof LocalDate) {
             try {
-                return LocalDate.parse(token);
+                return LocalDate.parse(name);
             } catch (DateTimeParseException e) {
                 throw new ParseException(ERROR_ARG, 0);
             }
-        } else if (arg instanceof String) {
-            return name;
         } else {
             throw new ParseException(ERROR_ARG, 0);
         }

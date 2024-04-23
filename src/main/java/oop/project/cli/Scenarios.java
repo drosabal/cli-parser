@@ -121,7 +121,7 @@ public class Scenarios {
         parser.addArg(LocalDate.now());
         Command command = parser.parse(input);
         if (command != null) {
-            LocalDate date = (LocalDate)command.getArgs().getFirst();
+            LocalDate date = (LocalDate)command.getArgs().get(0);
             return Map.of("date", date);
         } else {
             return null;
