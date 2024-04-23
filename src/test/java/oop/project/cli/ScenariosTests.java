@@ -115,6 +115,27 @@ public class ScenariosTests {
 
     }
 
+    @Nested
+    class RegisterUser {
+
+        @ParameterizedTest
+        @MethodSource
+        public void testRegisterUser(String name, String command, Object expected) {
+            test(command, expected);
+        }
+
+        public static Stream<Arguments> testRegisterUser() {
+            return Stream.of(
+                    Arguments.of("Valid", "registerUser --password \"pass1234\" \"johnDoe\" \"jdoe@gmail.com\"",
+                            Map.of("username", "johnDoe", "email", "jdoe@gmail.com", "password", "pass1234")),
+                    Arguments.of("No Password", "registerUser \"johnDoe\" \"jdoe@gmail.com\"",
+                            Map.of("username", "johnDoe", "email", "jdoe@gmail.com", "password", Optional.empty())),
+                    Arguments.of("Missing Username", "registerUser \"jdoe@gmail.com\"", null)
+            );
+        }
+
+    }
+
     private static void test(String command, Object expected) {
         var result = Scenarios.parse(command);
         Assertions.assertEquals(expected, result);

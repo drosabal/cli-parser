@@ -27,6 +27,7 @@ public class Scenarios {
             case "sqrt" -> sqrt(input);
             case "calc" -> calc(input);
             case "date" -> date(input);
+            case "registerUser" -> registerUser(input);
             default -> throw new IllegalArgumentException("Unknown command.");
         };
     }
@@ -60,12 +61,11 @@ public class Scenarios {
         Command command = parser.parse(input);
         if (command != null) {
             double right = (Double)command.getArgs().get(0);
-            if (command.getFlags().get("left") != null) {
-                Double left = (Double)command.getFlags().get("left").getArg().get();
+            if (command.getFlags().containsKey("left")) {
+                double left = (Double)command.getFlags().get("left").getArg().get();
                 return Map.of("left", left, "right", right);
             } else {
-                Optional<Double> left = Optional.empty();
-                return Map.of("left", left, "right", right);
+                return Map.of("left", Optional.empty(), "right", right);
             }
         } else {
             return null;
@@ -118,7 +118,7 @@ public class Scenarios {
      */
     static Map<String, Object> date(String input) {
         CliParser parser = new CliParser("date", false);
-        parser.addArg(LocalDate.now());
+        parser.addArg(LocalDate.EPOCH);
         Command command = parser.parse(input);
         if (command != null) {
             LocalDate date = (LocalDate)command.getArgs().get(0);
@@ -133,17 +133,25 @@ public class Scenarios {
     //for notable features. This doesn't need to be exhaustive, but this is a
     //good place to test/showcase your functionality in context.
 
+    /**
+     * Takes one named argument and two positional arguments:
+     *  - {@code password: <String>} (optional, named)
+     *  - {@code username: <String>} (required, positional)
+     *  - {@code email: <String>} (required, positional)
+     */
     static Map<String, Object> registerUser(String input) {
         CliParser parser = new CliParser("registerUser", false);
-        parser.addArg(String.class)
-                .addArg(String.class)
-                .addFlag("password", String.class);
+        parser.addArg("").addArg("").addFlag("password", "");
         Command command = parser.parse(input);
-        if (command != null && command.getArgs().size() == 2) {
-            String username = (String) command.getArgs().get(0);
-            String email = (String) command.getArgs().get(1);
-            Optional<String> password = command.getFlags().containsKey("password") ? Optional.of((String)command.getFlags().get("password").getArg().get()) : Optional.empty(); // Corrected Line
-            return Map.of("username", username, "email", email, "password", password);
+        if (command != null) {
+            String username = (String)command.getArgs().get(0);
+            String email = (String)command.getArgs().get(1);
+            if (command.getFlags().containsKey("password")) {
+                String password = (String)command.getFlags().get("password").getArg().get();
+                return Map.of("username", username, "email", email, "password", password);
+            } else {
+                return Map.of("username", username, "email", email, "password", Optional.empty());
+            }
         } else {
             return null;
         }
