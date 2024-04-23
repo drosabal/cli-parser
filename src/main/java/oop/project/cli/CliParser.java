@@ -8,6 +8,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Used to construct a command parser and parse an input string into a
+ * structured Command object from which arguments can be retrieved.
+ */
 public class CliParser {
 
     private final String name;
@@ -19,6 +23,11 @@ public class CliParser {
     private static final String ERROR_FLAG = "Error: Invalid flag";
     private static final String ERROR_ARG = "Error: Invalid argument";
 
+    /**
+     * Constructs a CliParser used to parse an input string into the specified format.
+     * Takes in a string for the command name and a boolean indicating whether a subcommand
+     * is required for the command to be valid.
+     */
     public CliParser(String name, boolean subcommandRequired) {
         this.name = name;
         this.subcommandRequired = subcommandRequired;
@@ -27,23 +36,40 @@ public class CliParser {
         subparsers = new HashSet<>();
     }
 
+    /**
+     * Adds a flag to the parser.
+     * Takes the name of the flag and an object of the desired argument type, or null if
+     * there should be no argument.
+     */
     public CliParser addFlag(String name, Object arg) {
         flags.add(new Flag(name, arg));
         return this;
     }
 
+    /**
+     * Adds an argument to the parser.
+     * Takes an object of the desired argument type.
+     */
     public CliParser addArg(Object arg) {
         args.add(arg);
         return this;
     }
 
+    /**
+     * Adds a subparser used to parse a subcommand.
+     * An object of the desired argument type should be passed in.
+     */
     public CliParser addSubparser(CliParser subparser) {
         subparsers.add(subparser);
         return this;
     }
 
     /**
-     * Constructs a Command object and parses arguments into it.
+     * Constructs a Command object and parses arguments into it from the input string.
+     * Valid command format: [COMMAND] [FLAGS] [POSITIONAL ARGUMENTS] [SUBCOMMAND].
+     * Command and subcommand names must be alphanumeric.
+     * Flag names begin with a double hyphen --.
+     * Arguments must be enclosed within double quotes "".
      */
     public Command parse(String input) {
         Command command = new Command();
@@ -116,7 +142,7 @@ public class CliParser {
         return command;
     }
 
-    /**
+    /*
      * Parses token into an object with the same type as arg and returns it.
      */
     private Object parseArg(String token, Object arg) throws ParseException {
