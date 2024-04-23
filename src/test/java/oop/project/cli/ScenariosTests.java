@@ -116,7 +116,7 @@ public class ScenariosTests {
     }
 
     @Nested
-    class RegisterUser {
+    class Other {
 
         @ParameterizedTest
         @MethodSource
@@ -131,6 +131,62 @@ public class ScenariosTests {
                     Arguments.of("No Password", "registerUser \"johnDoe\" \"jdoe@gmail.com\"",
                             Map.of("username", "johnDoe", "email", "jdoe@gmail.com", "password", Optional.empty())),
                     Arguments.of("Missing Username", "registerUser \"jdoe@gmail.com\"", null)
+            );
+        }
+
+        @ParameterizedTest
+        @MethodSource
+        public void testFileOperation(String name, String command, Object expected) {
+            test(command, expected);
+        }
+
+        public static Stream<Arguments> testFileOperation() {
+            return Stream.of(
+                    Arguments.of("Valid", "fileOperation --force \"example.txt\"",
+                            Map.of("force", true, "file", "example.txt")),
+                    Arguments.of("Missing File", "fileOperation --force", null)
+            );
+        }
+
+        @ParameterizedTest
+        @MethodSource
+        public void testSetUserRole(String name, String command, Object expected) {
+            test(command, expected);
+        }
+
+        public static Stream<Arguments> testSetUserRole() {
+            return Stream.of(
+                    Arguments.of("Valid", "setUserRole --role \"admin\" \"john_doe\"",
+                            Map.of("role", "admin", "expires", Optional.empty(), "username", "john_doe")),
+                    Arguments.of("Missing Username", "setUserRole --role \"admin\"", null)
+            );
+        }
+
+        @ParameterizedTest
+        @MethodSource
+        public void testProcessData(String name, String command, Object expected) {
+            test(command, expected);
+        }
+
+        public static Stream<Arguments> testProcessData() {
+            return Stream.of(
+                    Arguments.of("Valid", "processData --validate \"data.csv\"",
+                            Map.of("validate", true, "clean", false, "dataFile", "data.csv")),
+                    Arguments.of("Missing File", "processData --validate --clean", null)
+            );
+        }
+
+        @ParameterizedTest
+        @MethodSource
+        public void testScheduleEvent(String name, String command, Object expected) {
+            test(command, expected);
+        }
+
+        public static Stream<Arguments> testScheduleEvent() {
+            return Stream.of(
+                    Arguments.of("Valid", "scheduleEvent --reminder \"15\" \"2023-11-25\" \"Meeting\"",
+                            Map.of("date", LocalDate.of(2023, 11, 25), "title", "Meeting", "location", Optional.empty(), "reminder", 15)),
+                    Arguments.of("Missing Date", "scheduleEvent --reminder \"15\" \"Meeting\"", null)
             );
         }
 

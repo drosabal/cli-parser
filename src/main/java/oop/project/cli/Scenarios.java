@@ -28,6 +28,10 @@ public class Scenarios {
             case "calc" -> calc(input);
             case "date" -> date(input);
             case "registerUser" -> registerUser(input);
+            case "fileOperation" -> fileOperation(input);
+            case "setUserRole" -> setUserRole(input);
+            case "processData" -> processData(input);
+            case "scheduleEvent" -> scheduleEvent(input);
             default -> throw new IllegalArgumentException("Unknown command.");
         };
     }
@@ -159,16 +163,16 @@ public class Scenarios {
 
     /**
      * Simulates file operation with advanced error handling.
-     * Example: fileOperation (--delete "example.txt" --force)
+     * Example: fileOperation --force "example.txt"
      */
     static Map<String, Object> fileOperation(String input) {
         CliParser parser = new CliParser("fileOperation", false);
-        parser.addFlag("delete", "").addFlag("force", Boolean.FALSE);
+        parser.addArg("").addFlag("force", null);
         Command command = parser.parse(input);
         if (command != null) {
-            String fileToDelete = (String)command.getFlags().get("delete").getArg().orElse(null);
-            Boolean force = (Boolean)command.getFlags().get("force").getArg().orElse(null);
-            return Map.of("fileToDelete", fileToDelete, "force", force);
+            String file = (String)command.getArgs().get(0);
+            boolean force = command.getFlags().containsKey("force");
+            return Map.of("force", force, "file", file);
         } else {
             return null;
         }
@@ -176,17 +180,29 @@ public class Scenarios {
 
     /**
      * Manages user permissions with multiple flags.
-     * Example: setUserRole ("john_doe" --role "admin" --expires "2023-12-31")
+     * Example: setUserRole --role "admin" --expires "2023-12-31" "john_doe"
      */
     static Map<String, Object> setUserRole(String input) {
         CliParser parser = new CliParser("setUserRole", false);
-        parser.addArg("").addFlag("role", "").addFlag("expires", LocalDate.now());
+        parser.addArg("").addFlag("role", "").addFlag("expires", LocalDate.EPOCH);
         Command command = parser.parse(input);
         if (command != null) {
             String username = (String)command.getArgs().get(0);
-            String role = (String)command.getFlags().get("role").getArg().orElse(null);
-            LocalDate expires = (LocalDate)command.getFlags().get("expires").getArg().orElse(null);
-            return Map.of("username", username, "role", role, "expires", expires);
+            String role;
+            LocalDate expires;
+            if (command.getFlags().containsKey("role") && command.getFlags().containsKey("expires")) {
+                role = (String)command.getFlags().get("role").getArg().get();
+                expires = (LocalDate) command.getFlags().get("role").getArg().get();
+                return Map.of("role", role, "expires", expires, "username", username);
+            } else if (command.getFlags().containsKey("role")) {
+                role = (String)command.getFlags().get("role").getArg().get();
+                return Map.of("role", role, "expires", Optional.empty(), "username", username);
+            } else if (command.getFlags().containsKey("expires")) {
+                expires = (LocalDate) command.getFlags().get("role").getArg().get();
+                return Map.of("role", Optional.empty(), "expires", expires, "username", username);
+            } else {
+                return Map.of("role", Optional.empty(), "expires", Optional.empty(), "username", username);
+            }
         } else {
             return null;
         }
@@ -194,17 +210,17 @@ public class Scenarios {
 
     /**
      * Parses and validates data processing tasks with detailed error messages.
-     * Example: processData ("data.csv" --validate --clean)
+     * Example: processData --validate --clean "data.csv"
      */
     static Map<String, Object> processData(String input) {
         CliParser parser = new CliParser("processData", false);
-        parser.addArg("").addFlag("validate", Boolean.FALSE).addFlag("clean", Boolean.FALSE);
+        parser.addArg("").addFlag("validate", null).addFlag("clean", null);
         Command command = parser.parse(input);
         if (command != null) {
             String dataFile = (String)command.getArgs().get(0);
-            Boolean validate = (Boolean)command.getFlags().get("validate").getArg().orElse(null);
-            Boolean clean = (Boolean)command.getFlags().get("clean").getArg().orElse(null);
-            return Map.of("dataFile", dataFile, "validate", validate, "clean", clean);
+            boolean validate = command.getFlags().containsKey("validate");
+            boolean clean = command.getFlags().containsKey("clean");
+            return Map.of("validate", validate, "clean", clean, "dataFile", dataFile);
         } else {
             return null;
         }
@@ -212,18 +228,30 @@ public class Scenarios {
 
     /**
      * Manages complex event scheduling with multiple types of data.
-     * Example: scheduleEvent ("2023-11-25" "Meeting" --location "Conference Room A" --reminder "15")
+     * Example: scheduleEvent --location "Conference Room A" --reminder "15" "2023-11-25" "Meeting"
      */
     static Map<String, Object> scheduleEvent(String input) {
         CliParser parser = new CliParser("scheduleEvent", false);
-        parser.addArg("").addArg("").addFlag("location", "").addFlag("reminder", Integer.valueOf(0));
+        parser.addArg(LocalDate.EPOCH).addArg("").addFlag("location", "").addFlag("reminder", Integer.valueOf(0));
         Command command = parser.parse(input);
         if (command != null) {
-            LocalDate date = LocalDate.parse((String)command.getArgs().get(0));
+            LocalDate date = (LocalDate)command.getArgs().get(0);
             String title = (String)command.getArgs().get(1);
-            String location = (String)command.getFlags().get("location").getArg().orElse(null);
-            Integer reminder = (Integer)command.getFlags().get("reminder").getArg().orElse(null);
-            return Map.of("date", date, "title", title, "location", location, "reminder", reminder);
+            String location;
+            Integer reminder;
+            if (command.getFlags().containsKey("location") && command.getFlags().containsKey("reminder")) {
+                location = (String)command.getFlags().get("location").getArg().get();
+                reminder = (Integer)command.getFlags().get("reminder").getArg().get();
+                return Map.of("location", location, "reminder", reminder, "date", date, "title", title);
+            } else if (command.getFlags().containsKey("location")) {
+                location = (String)command.getFlags().get("location").getArg().get();
+                return Map.of("location", location, "reminder", Optional.empty(), "date", date, "title", title);
+            } else if (command.getFlags().containsKey("reminder")) {
+                reminder = (Integer)command.getFlags().get("reminder").getArg().get();
+                return Map.of("location", Optional.empty(), "reminder", reminder, "date", date, "title", title);
+            } else {
+                return Map.of("location", Optional.empty(), "reminder", Optional.empty(), "date", date, "title", title);
+            }
         } else {
             return null;
         }
